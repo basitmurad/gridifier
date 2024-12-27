@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -6,10 +7,11 @@ class SignInScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final phoneController = TextEditingController();
+    String countryCode = "+1"; // Default country code
 
     void sendOtp() {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("OTP sent to ${phoneController.text}")),
+        SnackBar(content: Text("OTP sent to $countryCode ${phoneController.text}")),
       );
       // Navigate to the OTP verification screen
       Navigator.push(
@@ -20,9 +22,25 @@ class SignInScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sign In"),
+        title: Text(
+          "Sign In",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        elevation: 5, // Adds a shadow for a floating effect
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(30), // Rounded bottom edges
+            ),
+            gradient: LinearGradient(
+              colors: [Colors.blueAccent, Colors.lightBlue],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.transparent, // To ensure the gradient is visible
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -50,15 +68,30 @@ class SignInScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            TextField(
-              controller: phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: "Phone Number",
-                hintText: "+1234567890",
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.phone),
-              ),
+            Row(
+              children: [
+                CountryCodePicker(
+                  onChanged: (code) {
+                    countryCode = code.dialCode ?? "+1";
+                  },
+                  initialSelection: 'US',
+                  favorite: ['+1', 'US'],
+                  showCountryOnly: false,
+                  showOnlyCountryWhenClosed: false,
+                  alignLeft: false,
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      labelText: "Phone Number",
+                      hintText: "1234567890",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             ElevatedButton(
